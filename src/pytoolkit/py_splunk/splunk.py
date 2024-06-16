@@ -147,3 +147,6 @@ def splunk_hec_upload(  # pylint: disable=too-many-arguments,too-many-locals
                 f'msg="Unable to upload data to splunk server"|splunk_server={server}, {error=}'
             )
     return resp_list
+
+def splunk_upload_async():
+    """_summary_"""
