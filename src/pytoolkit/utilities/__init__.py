@@ -193,13 +193,21 @@ def extract_matches(
     """
     Returns two lists; one that matches the condition and other that does not.
      Use the condition variable to send callable functions used in a regular expression match.
+    
+    Examples:
+        # Using a regular Expression search
+        m = extract_matches(iterable=files, condition=lambda x: [re.match(str(x.stem), RE_DATE_COMPILED)])
+        
+        # Using a comparison of datetime values
+        m = extract_matches(iterable=m.matches, condition=lambda x: [bool(datetime.strptime(str(x.stem).split('_', maxsplit=1)[-1],'%Y%m%dT%H%M') < datetime.now(timezone.utc) - timedelta(days=days))])
+
 
     :param iterable: Lists of Strings.
     :type iterable: Union[list[Any], None]
     :param condition: Callable function or lambda function.
     :type condition: Callable[[list[Any]], Any]
-    :return: matches
-    :rtype: Matches
+    :return: matches [Tuple]
+    :rtype: Tuple[match|no_match]
     """
     res = Matches([], [])
     if not iterable:
