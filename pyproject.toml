@@ -16,10 +16,10 @@ license = {file = "LICENSE"}
 classifiers = [
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: Implementation",
-    "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10"
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11"
 ]
 dynamic = ["version", "readme", "dependencies","description"]
 
@@ -33,11 +33,34 @@ test = [
     "pytest-mock",
     "unittest2",
     "dataclasses",
-    "six"
+    "six",
+    "black",
+    "isort",
+    "autoflake"
 ]
 
 [tool.pytest.ini_options]
 addopts = "-v --cov --cov-report html --cov-report term-missing --cov-fail-under 65"
+
+[tool.black]
+line-length = 127
+target-version = ["py39", "py310","py311"]
+include = '\.py$'
+extend-exclude = '''
+# A regex preceded with ^/ will apply only to files and directories
+# in the root of the project.
+(
+    .*/tests/.*
+)
+'''
+
+[tool.isort]
+profile = "hug"
+src_paths = ["pytoolkit"]
+multi_line_output = 3
+line_length = 88
+include_trailing_comma = true
+py_version = "3"
 
 [tool.setuptools.dynamic]
 dependencies = {file = "requirements.txt"}

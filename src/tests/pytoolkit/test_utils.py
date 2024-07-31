@@ -1,14 +1,13 @@
 # pylint: disable=missing-function-docstring,missing-class-docstring
 """Test Utilities."""
 
-from enum import Enum
 import functools
 import re
 import unittest
+from enum import Enum
 from unittest import mock
 
-from pytoolkit import utils
-from pytoolkit import static
+from pytoolkit import static, utils
 
 SANTIZE_DATA = {"password": "welcome123", "username": "testuser"}
 
