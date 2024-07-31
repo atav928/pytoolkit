@@ -6,11 +6,13 @@ import logging
 import platform
 import re
 import tempfile
+from configparser import ConfigParser
 from pathlib import Path
-from typing import Any, Union
+from typing import Any, Callable, Union
 
 import pandas as pd
 import yaml
+from pytoolkit.decorate import error_handler
 from pytoolkit.static import CONFIG_PATH, ENCODING, FILE_UMASK_PERMISSIONS
 
 
@@ -43,7 +45,7 @@ def get_config_section(filename: str, ftype: str, section: str = ""):
     return settings
 
 
-def read_yaml(filename: Union[Path, str], **kwargs: Any) -> dict[str, Any]:
+def read_yaml(filename: Union[Path, str], **kwargs: Any) -> dict[str, Any]:  # pylint: disable=unused-argument
     """
     Read in a YAML configuration file.
 
@@ -96,7 +98,7 @@ def set_location(location: str, extend_path: Union[str, None] = None, mode: str 
     if bool(re.match(r"(home|homedir)", location)):
         loc = "home"
     mode = mode if mode in FILE_UMASK_PERMISSIONS else "default"
-    base_dir = {"home": set_homedir, "var": get_var_dir}
+    base_dir: dict[str, Callable[..., str]] = {"home": set_homedir, "var": get_var_dir}
     return base_dir[loc](extend_path=extend_path, mode=mode)
 
 
@@ -179,7 +181,7 @@ def get_config_location(
         return None
 
 
-def read_csv(filename: Union[Path, str], **kwargs: Any) -> list[dict[str, Any]]:
+def read_csv(filename: Union[Path, str], **kwargs: Any) -> Union[pd.DataFrame, list[dict[str, Any]]]:
     """
     Reads in a CSV and outputs a record of dictionary values
 
@@ -191,8 +193,11 @@ def read_csv(filename: Union[Path, str], **kwargs: Any) -> list[dict[str, Any]]:
     # Old Default
     # df: pd.DataFrame = pd.read_csv(filename,index_col='index')
     check_file(filename=str(filename))
-    df: pd.DataFrame = pd.read_csv(filename, **kwargs)
-    return df.to_dict("records")
+    df: pd.DataFrame = pd.read_csv(filename, **kwargs)  # type: ignore
+    if kwargs.get("to_dict"):
+        # Should default to orient=`records`, but should be passed
+        return df.to_dict(**kwargs)  # type: ignore
+    return df  # type: ignore
 
 
 def read_json(filename: Union[Path, str], **kwargs: Any) -> Union[pd.DataFrame, dict[str, Any]]:
@@ -213,7 +218,7 @@ def read_json(filename: Union[Path, str], **kwargs: Any) -> Union[pd.DataFrame, 
     return data
 
 
-def read_txt(filename: Union[Path, str], **kwargs: Any):
+def read_txt(filename: Union[Path, str], **kwargs: Any) -> list[str]:  # pylint: disable=unused-argument
     """
     Read in standard text file as a list by default. Adjust with `kwargs` to change the type of output.
 
@@ -228,7 +233,7 @@ def read_txt(filename: Union[Path, str], **kwargs: Any):
     return contents
 
 
-def read_ini(filename: Union[Path, str, list[Path], list[str]], **kwargs: Any):
+def read_ini(filename: Union[Path, str, list[Path], list[str]], **kwargs: Any) -> Any:  # pylint: disable=unused-argument
     """
     Read in INI Configuration File/Files.
 
@@ -239,7 +244,7 @@ def read_ini(filename: Union[Path, str, list[Path], list[str]], **kwargs: Any):
     """
     # TODO: allow for a list to be passed from `readfile` function
     # filename = filename if isinstance(filename,list) else [filename]
-    configur = ConfigParser()
+    configur: Any = ConfigParser()
     # filenames = [str(_) for _ in filename]
     configur.read(filenames=filename, encoding=ENCODING)
     return configur
@@ -256,7 +261,7 @@ FILEREADS: dict[str, Callable[..., Any]] = {
 
 
 @error_handler(exceptions=Exception, logger=logging.getLogger(__name__), default_return={"error": "Invalid file format"})
-def readfile(filename: str, **kwargs) -> Union[dict[str, Any], pd.Datframe, ConfigParser, list[str]]:
+def readfile(filename: str, **kwargs: Any) -> Union[dict[str, Any], pd.DataFrame, ConfigParser, list[str]]:
     """
     Reads in different types of files and reports them as needed depending on additional variables passed.
 

@@ -2,6 +2,14 @@
 
 Python General tools
 
+**Table of Contents:**
+1. [Utilities](#utilities)
+   1. [Dataclass Base](#dataclass-base)
+   2. [Maniuplating Dictionaries](#maniuplating-dictionaries)
+      1. [Search Utilities](#search-utilities)
+   3. [Files](#files)
+
+
 ## Utilities
 
 `string_or_list` function allows you to interpret a string and return a list. Provides you the option of adding a delimeter using an OR function to return a possible string that you may be expecting possible commond delimeters. Such as: `",|:|\|, "`.
@@ -113,9 +121,8 @@ __TODO:__ Add splunk HEC fromatter with proper chunck
 
 __TODO:__ KVSTORE configuration tool.
 
-### Utilities
 
-Sanatize dictionary data
+**Sanatize dictionary data**
 
 ```python
 from pytoolkit.utils import sanatize_data
@@ -155,4 +162,21 @@ The aove code passes a `lambda` function that allows you to create a single or l
 ```python
 m.match
 m.no_match
+```
+
+### Files
+
+Reads different file types:
+
+* yaml
+* json
+* csv
+* text
+* ini
+
+Read in files and manipulate them using standard functions and `pandas` library.
+
+```python
+from pytoolkit.files import readfile
+
 ```
