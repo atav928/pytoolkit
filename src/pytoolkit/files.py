@@ -2,17 +2,15 @@
 """Files."""
 
 import json
+import logging
 import platform
 import re
 import tempfile
 from pathlib import Path
 from typing import Any, Union
 
-import logging
-import yaml
-
 import pandas as pd
-
+import yaml
 from pytoolkit.static import CONFIG_PATH, ENCODING, FILE_UMASK_PERMISSIONS
 
 
@@ -45,7 +43,7 @@ def get_config_section(filename: str, ftype: str, section: str = ""):
     return settings
 
 
-def read_yaml(filename: Union[Path,str], **kwargs: Any) -> dict[str, Any]:
+def read_yaml(filename: Union[Path, str], **kwargs: Any) -> dict[str, Any]:
     """
     Read in a YAML configuration file.
 
@@ -151,7 +149,7 @@ def get_config_location(
     config_location: list[str],
     app_name: Union[str, None] = None,
     file_format: str = "yml",
-) -> str:
+) -> Union[str, None]:
     """
     Retrieve configuraiton lcoation if one exists in the paths to search.
 
@@ -178,7 +176,8 @@ def get_config_location(
         # TODO: Allow for diff types as currentlu just allowing yaml.
         if Path.is_file(Path(CONFIG_PATH.format(location, app_name, file_format) if app_name else location)):
             return location
-        return ""
+        return None
+
 
 def read_csv(filename: Union[Path, str], **kwargs: Any) -> list[dict[str, Any]]:
     """
@@ -190,12 +189,13 @@ def read_csv(filename: Union[Path, str], **kwargs: Any) -> list[dict[str, Any]]:
     :rtype: list[dict[str, Any]]
     """
     # Old Default
-    #df: pd.DataFrame = pd.read_csv(filename,index_col='index')
+    # df: pd.DataFrame = pd.read_csv(filename,index_col='index')
     check_file(filename=str(filename))
     df: pd.DataFrame = pd.read_csv(filename, **kwargs)
-    return df.to_dict('records')
+    return df.to_dict("records")
 
-def read_json(filename: Union[Path, str], **kwargs: Any) -> Union[pd.DataFrame, dict[str,Any]]:
+
+def read_json(filename: Union[Path, str], **kwargs: Any) -> Union[pd.DataFrame, dict[str, Any]]:
     """
     Reads in json file directly.
 
@@ -208,9 +208,10 @@ def read_json(filename: Union[Path, str], **kwargs: Any) -> Union[pd.DataFrame, 
     if kwargs.get("dataframe"):
         return pd.read_json(filename, **kwargs)
     data = {}
-    with open(filename,'r', encoding="UTF-8") as f:
-        data: dict[str,Any] = json.load(f)
+    with open(filename, "r", encoding="UTF-8") as f:
+        data: dict[str, Any] = json.load(f)
     return data
+
 
 def read_txt(filename: Union[Path, str], **kwargs: Any):
     """
@@ -222,9 +223,10 @@ def read_txt(filename: Union[Path, str], **kwargs: Any):
     :rtype: _type_
     """
     check_file(filename=str(filename))
-    with open(filename, 'r', encoding=ENCODING) as f:
+    with open(filename, "r", encoding=ENCODING) as f:
         contents = f.readlines()
     return contents
+
 
 def read_ini(filename: Union[Path, str, list[Path], list[str]], **kwargs: Any):
     """
@@ -236,13 +238,14 @@ def read_ini(filename: Union[Path, str, list[Path], list[str]], **kwargs: Any):
     :rtype: _type_
     """
     # TODO: allow for a list to be passed from `readfile` function
-    #filename = filename if isinstance(filename,list) else [filename]
+    # filename = filename if isinstance(filename,list) else [filename]
     configur = ConfigParser()
-    #filenames = [str(_) for _ in filename]
+    # filenames = [str(_) for _ in filename]
     configur.read(filenames=filename, encoding=ENCODING)
     return configur
 
-FILEREADS: dict[str,Callable[..., Any]] = {
+
+FILEREADS: dict[str, Callable[..., Any]] = {
     ".csv": read_csv,
     ".json": read_json,
     ".yml": read_yaml,
@@ -251,8 +254,9 @@ FILEREADS: dict[str,Callable[..., Any]] = {
     ".ini": read_ini,
 }
 
-@error_handler(exceptions=Exception,logger=logging.getLogger(__name__),default_return={'error': 'Invalid file format'})
-def readfile(filename: str, **kwargs) -> Union[dict[str, Any],pd.Datframe, ConfigParser, list[str]]:
+
+@error_handler(exceptions=Exception, logger=logging.getLogger(__name__), default_return={"error": "Invalid file format"})
+def readfile(filename: str, **kwargs) -> Union[dict[str, Any], pd.Datframe, ConfigParser, list[str]]:
     """
     Reads in different types of files and reports them as needed depending on additional variables passed.
 
