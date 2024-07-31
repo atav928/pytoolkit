@@ -3,10 +3,9 @@
 import re
 import tempfile
 import uuid
-
 from pathlib import Path
-import certifi
 
+import certifi
 from pytoolkit.static import ENCODING, PEM_REGEX, TMP_PEM_POSTFIX
 from pytoolkit.utils import check_file, return_filelines, string_or_list
 

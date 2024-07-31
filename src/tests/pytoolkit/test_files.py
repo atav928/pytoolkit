@@ -1,10 +1,10 @@
 """File Mock."""
 
 import unittest
-from unittest.mock import mock_open
 from unittest import mock
+from unittest.mock import mock_open
 
-from pytoolkit.files import read_yaml, get_var_dir
+from pytoolkit.files import get_var_dir, read_yaml
 
 
 class TestReadYaml(unittest.TestCase):

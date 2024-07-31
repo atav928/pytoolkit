@@ -54,10 +54,6 @@ def convert_mac(
     else:
         pattern = re.compile("^[a-f0-9]{12}$", re.IGNORECASE)
         if not pattern.match(mac):
-            raise ValueError(
-                f"Unable to reformat MAC using {mac_format} due to invalid MAC {mac}"
-            )
-        mac_addr = f"{mac_format}".join(
-            mac[i : i + split_by] for i in range(0, 12, split_by)
-        )
+            raise ValueError(f"Unable to reformat MAC using {mac_format} due to invalid MAC {mac}")
+        mac_addr = f"{mac_format}".join(mac[i : i + split_by] for i in range(0, 12, split_by))
     return mac_addr.lower() if to_lower else mac_addr.upper()
