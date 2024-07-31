@@ -1,16 +1,15 @@
 # pylint: disable=invalid-name
 """Files."""
 
-import re
 import json
-from typing import Any, Union
-from pathlib import Path
 import platform
+import re
 import tempfile
+from pathlib import Path
+from typing import Any, Union
 
 import yaml
-
-from pytoolkit.static import ENCODING, FILE_UMASK_PERMISSIONS, CONFIG_PATH
+from pytoolkit.static import CONFIG_PATH, ENCODING, FILE_UMASK_PERMISSIONS
 
 
 class BytesDump(json.JSONEncoder):
@@ -80,26 +79,16 @@ def get_var_dir(extend_path: Union[str, None] = None, mode: str = "default") -> 
     }
     plat: str = platform.system()
     try:
-        path = (
-            Path(f"{str(directory[plat.lower()])}/{extend_path}")
-            if extend_path
-            else Path(str(directory[plat.lower()]))
-        )
+        path = Path(f"{str(directory[plat.lower()])}/{extend_path}") if extend_path else Path(str(directory[plat.lower()]))
         mkdir(path=path, mode=mode)
         return str(path)
     except KeyError:
-        path = (
-            Path(f"{str(tempfile.gettempdir())}/{extend_path}")
-            if extend_path
-            else Path(tempfile.gettempdir())
-        )
+        path = Path(f"{str(tempfile.gettempdir())}/{extend_path}") if extend_path else Path(tempfile.gettempdir())
         mkdir(path=path, mode=mode)
         return str(path)
 
 
-def set_location(
-    location: str, extend_path: Union[str, None] = None, mode: str = "default"
-) -> str:
+def set_location(location: str, extend_path: Union[str, None] = None, mode: str = "default") -> str:
     """Set default logDir or configuration directory based on mode defined."""
     loc = "var"
     if bool(re.match(r"(home|homedir)", location)):
@@ -183,12 +172,6 @@ def get_config_location(
     """
     for location in config_location:
         # TODO: Allow for diff types as currentlu just allowing yaml.
-        if Path.is_file(
-            Path(
-                CONFIG_PATH.format(location, app_name, file_format)
-                if app_name
-                else location
-            )
-        ):
+        if Path.is_file(Path(CONFIG_PATH.format(location, app_name, file_format) if app_name else location)):
             return location
         return ""

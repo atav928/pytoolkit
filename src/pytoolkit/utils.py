@@ -1,27 +1,24 @@
 # pylint: disable=broad-exception-caught
 """Utilities."""
 
-from enum import Enum
+import base64
+import json
 import os
-from pathlib import Path
 import platform
 import pwd
-import socket
-from typing import Any, List, Union
-import base64
 import re
-import json
+import socket
+from enum import Enum
+from pathlib import Path
+from typing import Any, List, Union
 
 import airportsdata
-
 from pytoolkit.decorate import error_handler
 from pytoolkit.static import ENCODING, NO_AIRPORTDATA, RE_DOMAIN, RE_IP4, SANATIZE_KEYS
 from pytoolkit.utilities import flatten_dictionary, nested_dict
 
 PATTERN = re.compile(r"(?<!^)(?=[A-Z])")
-AIRPORTDATA = json.loads(
-    json.dumps(airportsdata.load(code_type="IATA"), ensure_ascii=False)
-)
+AIRPORTDATA = json.loads(json.dumps(airportsdata.load(code_type="IATA"), ensure_ascii=False))
 
 
 def os_plat() -> str:
@@ -127,9 +124,7 @@ def string_or_list(value: Any, delimeters: Union[str, None] = None) -> list[str]
     if value is None:
         return None  # type: ignore
     if isstring(value):
-        return (
-            re.split(delimeters, value, flags=re.IGNORECASE) if delimeters else [value]
-        )
+        return re.split(delimeters, value, flags=re.IGNORECASE) if delimeters else [value]
     return (
         list(value)
         if "__iter__" in dir(value)
@@ -252,11 +247,7 @@ def return_hostinfo(fqdn: bool = True) -> str:
         return socket.getfqdn()
     host: str = socket.gethostname()
     if re.match(RE_DOMAIN, host, re.IGNORECASE):
-        return (
-            ".".join(host.split(".")[:-2])
-            if ".".join(host.split(".")[:-2]) != ""
-            else ".".join(host.split(".")[:-1])
-        )
+        return ".".join(host.split(".")[:-2]) if ".".join(host.split(".")[:-2]) != "" else ".".join(host.split(".")[:-1])
     return host
 
 
@@ -282,9 +273,7 @@ def set_bool(value: str, default: bool = False) -> Union[str, bool]:
     return value_bool
 
 
-def sanatize_data(  # pylint: disable=W0102
-    data: dict[str, Any], keys: list[str] = SANATIZE_KEYS
-) -> dict[str, Any]:
+def sanatize_data(data: dict[str, Any], keys: list[str] = SANATIZE_KEYS) -> dict[str, Any]:  # pylint: disable=W0102
     """
     Sanatize Data from a dictionary of values if a string is found to mask values that should not be exposed.
 
@@ -296,10 +285,7 @@ def sanatize_data(  # pylint: disable=W0102
     :rtype: dict[str, Any]
     """
     flat = flatten_dictionary(data)
-    new_dict = {
-        key: "[MASKED]" if isinstance(key, str) and key.lower() in keys else value
-        for key, value in flat.items()
-    }
+    new_dict = {key: "[MASKED]" if isinstance(key, str) and key.lower() in keys else value for key, value in flat.items()}
     return nested_dict(new_dict)
 
 
