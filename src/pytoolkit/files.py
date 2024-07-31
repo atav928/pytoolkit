@@ -3,14 +3,19 @@
 
 import re
 import json
-from typing import Any, Union
+from typing import Any, Callable, Union
 from pathlib import Path
 import platform
 import tempfile
 
+import logging
 import yaml
+from configparser import ConfigParser
+
+import pandas as pd
 
 from pytoolkit.static import ENCODING, FILE_UMASK_PERMISSIONS, CONFIG_PATH
+from src.pytoolkit.decorate import error_handler
 
 
 class BytesDump(json.JSONEncoder):
@@ -42,7 +47,7 @@ def get_config_section(filename: str, ftype: str, section: str = ""):
     return settings
 
 
-def read_yaml(filename: Path) -> dict[str, Any]:
+def read_yaml(filename: Union[Path,str], **kwargs: Any) -> dict[str, Any]:
     """
     Read in a YAML configuration file.
 
@@ -192,3 +197,87 @@ def get_config_location(
         ):
             return location
         return ""
+
+def read_csv(filename: Union[Path, str], **kwargs: Any) -> list[dict[str, Any]]:
+    """
+    Reads in a CSV and outputs a record of dictionary values
+
+    :param filename: _description_
+    :type filename: Path
+    :return: _description_
+    :rtype: list[dict[str, Any]]
+    """
+    # Old Default
+    #df: pd.DataFrame = pd.read_csv(filename,index_col='index')
+    check_file(filename=str(filename))
+    df: pd.DataFrame = pd.read_csv(filename, **kwargs)
+    return df.to_dict('records')
+
+def read_json(filename: Union[Path, str], **kwargs: Any) -> Union[pd.DataFrame, dict[str,Any]]:
+    """
+    Reads in json file directly.
+
+    :param filename: _description_
+    :type filename: Path
+    :return: _description_
+    :rtype: dict[str,Any]
+    """
+    check_file(filename=str(filename))
+    if kwargs.get("dataframe"):
+        return pd.read_json(filename, **kwargs)
+    data = {}
+    with open(filename,'r', encoding="UTF-8") as f:
+        data: dict[str,Any] = json.load(f)
+    return data
+
+def read_txt(filename: Union[Path, str], **kwargs: Any):
+    """
+    Read in standard text file as a list by default. Adjust with `kwargs` to change the type of output.
+
+    :param filename: _description_
+    :type filename: Union[Path, str]
+    :return: _description_
+    :rtype: _type_
+    """
+    check_file(filename=str(filename))
+    with open(filename, 'r', encoding=ENCODING) as f:
+        contents = f.readlines()
+    return contents
+
+def read_ini(filename: Union[Path, str, list[Path], list[str]], **kwargs: Any):
+    """
+    Read in INI Configuration File/Files.
+
+    :param filename: _description_
+    :type filename: Union[Path, str, list[Path], list[str]]
+    :return: _description_
+    :rtype: _type_
+    """
+    # TODO: allow for a list to be passed from `readfile` function
+    #filename = filename if isinstance(filename,list) else [filename]
+    configur = ConfigParser()
+    #filenames = [str(_) for _ in filename]
+    configur.read(filenames=filename, encoding=ENCODING)
+    return configur
+
+FILEREADS: dict[str,Callable[..., Any]] = {
+    ".csv": read_csv,
+    ".json": read_json,
+    ".yml": read_yaml,
+    ".yaml": read_yaml,
+    ".txt": read_txt,
+    ".ini": read_ini,
+}
+
+@error_handler(exceptions=Exception,logger=logging.getLogger(__name__),default_return={'error': 'Invalid file format'})
+def readfile(filename: str, **kwargs) -> Union[dict[str, Any],pd.Datframe, ConfigParser, list[str]]:
+    """
+    Reads in different types of files and reports them as needed depending on additional variables passed.
+
+    :param filename: FileName
+    :type filename: str
+    :return: File Content
+    :rtype: Union[dict[str, Any],pd.Datframe, ConfigParser, list[str]]
+    """
+    extension = Path(filename).suffix
+    return FILEREADS[extension](Path(filename), **kwargs)
