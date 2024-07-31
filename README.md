@@ -133,3 +133,26 @@ sanatized_dict = sanatize_data(data=test_dict)
 print(sanatize_dict)
 # {"value1": "one", "value2": "two", "subvalue01": { "password": "[MASKED]", "username": "testuser"}}
 ```
+
+#### Search Utilities
+
+`extract_matches` function allows you to extract matches and non matches from a list of strings using a conditional function.
+
+__Sample Code:___
+
+```python
+from datetime import datetime, timezone, timedelta
+
+from pytoolkit.utilities import extract_matches
+
+# This function searches for data that is extracted from a file into a list and does a compare of the datetime to match values in a dataframe that are older than a certain time.
+m = extract_matches(iterable=m.matches, condition=lambda x: [bool(datetime.strptime(str(x.stem).split('_', maxsplit=1)[-1],'%Y%m%dT%H%M') < datetime.now(timezone.utc) - timedelta(days=days))])
+
+```
+
+The aove code passes a `lambda` function that allows you to create a single or list of conditions that each line is used to search and return a match and non-match dataclass which can be exported using:
+
+```python
+m.match
+m.no_match
+```
