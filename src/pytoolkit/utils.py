@@ -325,9 +325,12 @@ def chunk_func(lst: list[Any], n: int) -> list[list[Any]]:
     return [lst[i : i + n] for i in range(0, len(lst), n)]
 
 
-def camel_to_snake(name: str):
+def camel_to_snake(name: Union[str,list[str]], output: Union[str,None] = None):
     """
     Convert simple Camel to Snake case does not handle complex patterns.
+    Manages more complex patterns when the original CamelCase is not written correctly.
+
+    See: https://stackoverflow.com/questions/1175208/elegant-python-function-to-convert-camelcase-to-snake-case
 
     Example:
         >>> value = 'someValue'
@@ -339,7 +342,18 @@ def camel_to_snake(name: str):
     :return: Snake case value.
     :rtype: str
     """
-    return PATTERN.sub("_", name).lower()
+    # TODO: convert to precompiled patterns
+    names = string_or_list(name)
+    snake_case = []
+    for n in names:
+        # Handle any unusual characters select option on how to handle
+        n = re.sub(r'\ |\.|\|\,|', "", n)
+        n = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', n)
+        n = re.sub('([a-z0-9])([A-Z])', r'\1_\2', n).lower()
+        snake_case.append(n)
+    if output in ['list']:
+        return snake_case
+    return ','.join(snake_case)
 
 
 def snake_to_camel(name: str) -> str:
