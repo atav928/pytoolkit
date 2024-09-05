@@ -3,7 +3,8 @@
 Python General tools
 
 **Table of Contents:**
-1. [Utilities](#utilities)
+1. [Installation](#installation)
+2. [Utilities](#utilities)
    1. [Manipulating Strings](#manipulating-strings)
       1. [String to List](#string-to-list)
       2. [Camel and Snake Cases](#camel-and-snake-cases)
@@ -12,6 +13,13 @@ Python General tools
       1. [Search Utilities](#search-utilities)
    4. [Files](#files)
 
+## Installation
+
+Source: [https://pypi.org/project/pytoolkit928/](https://pypi.org/project/pytoolkit928/)
+
+```bash
+>>> python -m pip install pytoolkit928
+```
 
 ## Utilities
 
