@@ -4,13 +4,22 @@ Python General tools
 
 **Table of Contents:**
 1. [Utilities](#utilities)
-   1. [Dataclass Base](#dataclass-base)
-   2. [Maniuplating Dictionaries](#maniuplating-dictionaries)
+   1. [Manipulating Strings](#manipulating-strings)
+      1. [String to List](#string-to-list)
+      2. [Camel and Snake Cases](#camel-and-snake-cases)
+   2. [Dataclass Base](#dataclass-base)
+   3. [Maniuplating Dictionaries](#maniuplating-dictionaries)
       1. [Search Utilities](#search-utilities)
-   3. [Files](#files)
+   4. [Files](#files)
 
 
 ## Utilities
+
+**NOTE:** There are 2 utils files that will be fixed in later releases. Currently `pyoolkit.utils` holds basic utilities and `pytoolkit.utilities` holds primarily dataclass and dict reformat utilities.
+
+### Manipulating Strings
+
+#### String to List
 
 `string_or_list` function allows you to interpret a string and return a list. Provides you the option of adding a delimeter using an OR function to return a possible string that you may be expecting possible commond delimeters. Such as: `",|:|\|, "`.
 
@@ -26,6 +35,31 @@ __Example:__
 ['string1', 'string2', 'string3|string4']
 >>> string_or_list(test,delimeters=',| |\|')
 ['string1', 'string2', 'string3', 'string4']
+```
+
+#### Camel and Snake Cases
+
+**Camel_to_Snake Case:**
+
+Converts camelCase into snake_case values. This funcition uses regular expressions to also handle `special characters` found in some non-standard formats.
+
+```bash
+>>> from pytoolkit.utils import camel_to_snake
+>>> camel_to_snake(name='someValue.1')
+'some_value1'
+# To use a list of values and return them use `output='list'`
+>>> camel_to_snake(name=['someValue.1', 'someValue', 'nextValue', 'lastTimeModifiedValue'], output='list')
+['some_value1', 'some_value', 'next_value', 'last_time_modified_value']
+```
+
+**Snake_to_Camel Case:**
+
+Converts snake_case values into camelCase.
+
+```bash
+>>> from pytoolkit.utils import snake_to_camel
+>>> snake_to_camel(name='last_time_modified_value')
+'lastTimeModifiedValue
 ```
 
 ### Dataclass Base
@@ -145,7 +179,7 @@ print(sanatize_dict)
 
 `extract_matches` function allows you to extract matches and non matches from a list of strings using a conditional function.
 
-__Sample Code:___
+__Sample Code:__
 
 ```python
 from datetime import datetime, timezone, timedelta

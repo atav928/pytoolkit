@@ -12,6 +12,7 @@ from typing import Any, Callable, Union
 
 import pandas as pd
 import yaml
+
 from pytoolkit.decorate import error_handler
 from pytoolkit.static import CONFIG_PATH, ENCODING, FILE_UMASK_PERMISSIONS
 

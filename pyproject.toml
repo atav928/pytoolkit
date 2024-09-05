@@ -36,7 +36,9 @@ test = [
     "six",
     "black",
     "isort",
-    "autoflake"
+    "autoflake",
+    "safety",
+    "tomli"
 ]
 
 [tool.pytest.ini_options]
@@ -49,18 +51,45 @@ include = '\.py$'
 extend-exclude = '''
 # A regex preceded with ^/ will apply only to files and directories
 # in the root of the project.
-(
-    .*/tests/.*
-)
+/(
+      \.eggs
+    | \.git
+    | \.hg
+    | \.mypy_cache
+    | \.tox
+    | \.venv
+    | _build
+    | buck-out
+    | build
+    | dist
+    | public
+    | secrets
+    | tests/
+    # The following are specific to Black
+    | reports
+    | docs
+)/
 '''
+unstable = false
+
+[tool.pylint.message_control]
+disable = [
+    "fixme",
+    "too-few-public-methods",
+    "logging-fstring-interpolation",
+    "logging-format-interpolation"
+]
 
 [tool.isort]
-profile = "hug"
-src_paths = ["pytoolkit"]
+atomic = true
+profile = "black"
+src_paths = ["src"]
+skip = [".gitignore", ".dockerignore", ".venv", "tests", "test", ".csv", "build", "dist", "reports"]
 multi_line_output = 3
 line_length = 88
 include_trailing_comma = true
 py_version = "3"
+color_output = true
 
 [tool.setuptools.dynamic]
 dependencies = {file = "requirements.txt"}

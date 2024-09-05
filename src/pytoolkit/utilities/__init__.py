@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any, Callable, Generator, Hashable, List, Union
 
 import pandas as pd
+
 from pytoolkit.static import NONETYPE
 
 
