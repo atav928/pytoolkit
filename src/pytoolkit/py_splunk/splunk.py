@@ -9,6 +9,7 @@ from typing import Any, Optional, Union
 
 import requests
 import urllib3
+
 from pytoolkit.static import SPLUNK_HEC_EVENTPATH
 from pytoolkit.utilities import NONETYPE, BaseMonitor
 from pytoolkit.utils import chunk, reformat_exception

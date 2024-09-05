@@ -13,6 +13,7 @@ from pathlib import Path
 from typing import Any, List, Union
 
 import airportsdata
+
 from pytoolkit.decorate import error_handler
 from pytoolkit.static import ENCODING, NO_AIRPORTDATA, RE_DOMAIN, RE_IP4, SANATIZE_KEYS
 from pytoolkit.utilities import flatten_dictionary, nested_dict
@@ -324,54 +325,58 @@ def chunk_func(lst: list[Any], n: int) -> list[list[Any]]:
     """
     return [lst[i : i + n] for i in range(0, len(lst), n)]
 
-#TODO: seehttps://saturncloud.io/blog/how-to-update-a-pandas-dataframe-row-with-new-values/#:~:text=This%20can%20be%20done%20using,the%20column%20names%20as%20keys. for pandas function
+
+# TODO: see https://saturncloud.io/blog/how-to-update-a-pandas-dataframe-row-with-new-values/#:~:text=This%20can%20be%20done%20using,the%20column%20names%20as%20keys. for pandas function
 # import pandas as pd
-# 
+#
 # # create a sample dataframe
 # df = pd.DataFrame({
 #     'Name': ['John', 'Mary', 'Peter'],
 #     'Age': [30, 25, 35],
 #     'Gender': ['Male', 'Female', 'Male']
 # })
-# 
+#
 # # locate the row to update
 # row_index = df.loc[df['Name'] == 'John'].index[0]
-# 
+#
 # # update the row with new values
 # df.loc[row_index, 'Age'] = 35
 # df.loc[row_index, 'Gender'] = 'Male'
-# 
+#
 # # print the updated dataframe
 # print(df)
-def camel_to_snake(name: Union[str,list[str]], output: Union[str,None] = None):
+def camel_to_snake(name: Union[str, list[str]], output: Union[str, None] = None) -> Union[List[str], str]:
     """
-    Convert simple Camel to Snake case does not handle complex patterns.
+    Convert a complex Camel to Snake case does not handle complex patterns.
     Manages more complex patterns when the original CamelCase is not written correctly.
-
-    See: https://stackoverflow.com/questions/1175208/elegant-python-function-to-convert-camelcase-to-snake-case
+    ie. When a `.` is introduced or another `special char`.
 
     Example:
-        >>> value = 'someValue'
+        >>> value = 'someValue.1'
         >>> camel_to_snake(value)
-        `some_value`
+        `some_value1`
 
     :param name: Value to convert in camelCase.
     :type name: str
+    :param output: Type of output. Default `str`
+    :type output: str
     :return: Snake case value.
-    :rtype: str
+    :rtype: str | List[str]
     """
     # TODO: convert to precompiled patterns
-    names = string_or_list(name)
-    snake_case = []
+    names: List[str] = string_or_list(name)
+    snake_case: List[str] = []
     for n in names:
         # Handle any unusual characters select option on how to handle
-        n = re.sub(r'\ |\.|\|\,|', "", n)
-        n = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', n)
-        n = re.sub('([a-z0-9])([A-Z])', r'\1_\2', n).lower()
+        n: str = re.sub(r"\ |\.|\|\,|", "", n)
+        n = re.sub("(.)([A-Z][a-z]+)", r"\1_\2", n)
+        n = re.sub("([a-z0-9])([A-Z])", r"\1_\2", n).lower()
         snake_case.append(n)
-    if output in ['list']:
+    if output in ["list"]:
+        # Returns a List of Snake formated strings. Defaults to string
         return snake_case
-    return ','.join(snake_case)
+    # Returns a string value
+    return ",".join(snake_case)
 
 
 def snake_to_camel(name: str) -> str:
@@ -388,6 +393,7 @@ def snake_to_camel(name: str) -> str:
     :return: snake_case value.
     :rtype: str
     """
+    # TODO: add `output='list'` param to return a list of camelCase names
     init, *temp = name.split("_")
     return "".join([init.lower(), *map(str.title, temp)])
 

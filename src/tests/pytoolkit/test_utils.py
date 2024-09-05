@@ -135,9 +135,7 @@ class TestStringMethods(unittest.TestCase):
         self.assertIsInstance(invalid_response, dict)
 
     def test_chunk(self):
-        mock_hec_data = [
-            {"empty": "dict", "for": "testing", "value": x} for x in range(200)
-        ]
+        mock_hec_data = [{"empty": "dict", "for": "testing", "value": x} for x in range(200)]
         chunk_data = utils.chunk_func(mock_hec_data, 100)
         self.assertEqual(len(chunk_data), 2, "Data has been chunked into two arrays")
         self.assertEqual(
