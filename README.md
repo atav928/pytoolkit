@@ -1,6 +1,6 @@
 # PyToolkit
 
-Python General tools
+Python General tools.
 
 **Table of Contents:**
 1. [Installation](#installation)
